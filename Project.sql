@@ -1,3 +1,5 @@
+#SET SQL_SAFE_UPDATES = 0;
+
 CREATE TABLE PLATFORM
 (
 	Platform_ID		VARCHAR(7)				 PRIMARY KEY,
@@ -85,67 +87,97 @@ CREATE TABLE EMULATOR
 	INSERT INTO EMULATOR (Emulator_ID, Name, Platform_ID) VALUES ("gba1", "My Boy", "gba");
 	INSERT INTO EMULATOR (Emulator_ID, Name, Platform_ID) VALUES ("gb1", "Visual Boy", "gb");
 
+CREATE TABLE GAMENUMBER
+(
+	Num				SMALLINT
+);
+
+	INSERT INTO GAMENUMBER (Num) VALUES (0);
+
 CREATE TABLE GAME
 (
 	Game_ID			VARCHAR(10) 			 PRIMARY KEY,
 	Title			VARCHAR(40)		NOT NULL UNIQUE		,
 	ESRB_Rtng		VARCHAR(3)		NOT NULL			,
+	DVP				SMALLINT		NOT NULL			,
 	Company_ID		VARCHAR(10)							,
 	Description		VARCHAR(1000)						,
 	FOREIGN KEY(ESRB_Rtng) REFERENCES ESRB(ESRB_Rtng)	,
 	FOREIGN KEY(Company_ID) REFERENCES COMPANY(Company_ID)
 );
 
+		DROP TRIGGER IF EXISTS numgames;
+
+		delimiter ||
+		CREATE TRIGGER numgames 
+			AFTER INSERT ON GAME
+			FOR EACH ROW 
+		BEGIN
+			UPDATE GAMENUMBER 
+  		SET Num = Num + 1 ;
+		END||
+
+		delimiter ||
+		CREATE TRIGGER subgames
+			AFTER DELETE ON GAME
+ 		   	FOR EACH ROW
+		BEGIN
+			UPDATE GAMENUMBER
+    		SET Num = Num - 1;
+		END||
+
+		delimiter ;
+
 #48
 
-	INSERT INTO GAME (Game_ID, Title, ESRB_Rtng, Company_ID, Description) VALUES ('ffi', 'Final Fantasy', 'E', 'se', 'Players embark on a journey to find four magical crystals that can restore peace to the world.');
-	INSERT INTO GAME (Game_ID, Title, ESRB_Rtng, Company_ID, Description) VALUES ('ffii', 'Final Fantasy II', 'E', 'se', '');
-	INSERT INTO GAME (Game_ID, Title, ESRB_Rtng, Company_ID, Description) VALUES ('ffiii', 'Final Fantasy III', 'E10', 'se', 'Players embark on a journey to defeat an evil empire and stop a madman from destroying the world.');
-	INSERT INTO GAME (Game_ID, Title, ESRB_Rtng, Company_ID, Description) VALUES ('ffiv', 'Final Fantasy IV', 'E10', 'se', 'An adventure involving magical crystals and a mysterious kingdom.');
-	INSERT INTO GAME (Game_ID, Title, ESRB_Rtng, Company_ID, Description) VALUES ('ffv', 'Final Fantasy V', 'T', 'se', 'Embark on a quest to prevent an evil being from destroying the world.');
-	INSERT INTO GAME (Game_ID, Title, ESRB_Rtng, Company_ID, Description) VALUES ('ffvi', 'Final Fantasy VI', 'E10', 'se', '');
-	INSERT INTO GAME (Game_ID, Title, ESRB_Rtng, Company_ID, Description) VALUES ('ffvii', 'Final Fantasy VII', 'T', 'se', 'Mako: the discovery of this natural resource drawn directly from the planet’s life force marked the dawn of a new era, and now the energy sustains the lives of people across the world. However, the Shinra Company has monopolized mako production, and in doing so established a powerful hegemony, its influence reaching the far corners of the globe. Cloud, a former member of Shinra’s military organization, SOLDIER, joins the anti-Shinra resistance group AVALANCHE, despite caring little for their motives. During one of the groups attempts to stop the company, they learn of the return of Sephiroth, Cloud’s nemesis, and that with his reemergence, the planet is in greater danger than anyone had expected. With the fate of the world riding on their success, Cloud and his allies set out to quell this deadly threat.');
-	INSERT INTO GAME (Game_ID, Title, ESRB_Rtng, Company_ID, Description) VALUES ('crntr', 'Chrono Trigger', 'E10', 'se', 'Chrono, a boy from the year 1000 A.D., befriended a girl named Marle at Leene Square during a carnival. Chrono then to visit his friend Lucca, who’s working on a teleportation unit. Marle is too eager to try out the unfinished machine and it malfunctions. Instead of transporting her from one podium to another, she is sent somewhere far beyond Chrono’s time. Chrono volunteers to help and is thrust back through time. During his great adventures throughout time, Chrono discovers that, in 1999 A.D., Lavos erupts from the Earth and turns it into a desolate wasteland. United by this oncoming threat, Chrono and his comrades traverse the corridors of time in an attempt to alter the future...');
-	INSERT INTO GAME (Game_ID, Title, ESRB_Rtng, Company_ID, Description) VALUES ('crnrd', 'Radical Dreamers: Nusumenai Hoseki', 'NR', 'se', 'A side story to Chrono Trigger.');
-	INSERT INTO GAME (Game_ID, Title, ESRB_Rtng, Company_ID, Description) VALUES ('mtrd', 'Metroid', 'E', 'nin', '');
-	INSERT INTO GAME (Game_ID, Title, ESRB_Rtng, Company_ID, Description) VALUES ('mtrdii', 'Metroid II: Return of Samus', 'E', 'nin', '');
-	INSERT INTO GAME (Game_ID, Title, ESRB_Rtng, Company_ID, Description) VALUES ('smtrd', 'Super Metroid', 'E', 'nin', '');
-	INSERT INTO GAME (Game_ID, Title, ESRB_Rtng, Company_ID, Description) VALUES ('gstpd', 'Ghost Trick: Phantom Detective', 'T', 'cap', 'You wake up only to find that you are dead and without memories. To make things worse, you will disappear forever when the first light of dawn comes. Will you be able to uncover the truth in time?');
-	INSERT INTO GAME (Game_ID, Title, ESRB_Rtng, Company_ID, Description) VALUES ('9hrs', '9 Hours 9 Persons 9 Doors', 'M', 'chn', 'You are held captive inside a large ship with eight other characters, and must solve a series of pernicious and deadly puzzles in order to escape.');
-	INSERT INTO GAME (Game_ID, Title, ESRB_Rtng, Company_ID, Description) VALUES ('mm', 'Mega Man', 'E', 'cap', 'In the year 200X, robots developed to assist mankind are commonplace thanks to the efforts of renowned robot designer Dr. Light. However, one day these robots go out of control and start attacking the populace, among them six advanced humanoid robots made by Dr. Light for industrial purposes: Cut Man, Guts Man, Ice Man, Bomb Man, Fire Man, and Elec Man. He realizes the culprit is his old rival Dr. Wily (who plots to take over the world), but is unsure of what to do. His helper robot Rock, having a strong sense of justice, offers to be converted into a fighting robot to stop Dr. Wily’s plan, becoming Mega Man. Mega Man faces off against Wily and his robots so that order may be restored.');
-	INSERT INTO GAME (Game_ID, Title, ESRB_Rtng, Company_ID, Description) VALUES ('mmii', 'Mega Man II', 'E', 'cap', '');
-	INSERT INTO GAME (Game_ID, Title, ESRB_Rtng, Company_ID, Description) VALUES ('mmx', 'Mega Man X', 'E', 'cap', '');	
-	INSERT INTO GAME (Game_ID, Title, ESRB_Rtng, Company_ID, Description) VALUES ('zloz', 'The Legend of Zelda', 'E', 'nin', 'A small kingdom in the land of Hyrule is engulfed in chaos after an army led by Ganon, the Prince of Darkness, invaded it and stole the Triforce of Power, a part of a magical artifact bestowing great strength. In an attempt to prevent Ganon from acquiring the Triforce of Wisdom, another of the pieces, Princess Zelda splits it and hides the eight fragments in secret dungeons throughout the land. Before the princess is eventually kidnapped by Ganon, she commands her nursemaid Impa to find someone courageous enough to save the kingdom. While wandering the land, the old woman is surrounded by Ganon’s henchmen, though a young boy named Link appears and rescues her. After hearing Impa’s plea, he resolves to save Zelda and sets out to reassemble the scattered fragments of the Triforce of Wisdom, to become powerful enough to defeat Ganon.');
-	INSERT INTO GAME (Game_ID, Title, ESRB_Rtng, Company_ID, Description) VALUES ('zaol', 'The Adventure of Link', 'E', 'nin', '');
-	INSERT INTO GAME (Game_ID, Title, ESRB_Rtng, Company_ID, Description) VALUES ('zltp', 'A Link to the Past', 'E', 'nin', '');
-	INSERT INTO GAME (Game_ID, Title, ESRB_Rtng, Company_ID, Description) VALUES ('zlsa', 'Link’s Awakening', 'E', 'nin', '');
-	INSERT INTO GAME (Game_ID, Title, ESRB_Rtng, Company_ID, Description) VALUES ('zoot', 'The Ocarina of Time', 'E', 'nin', '');
-	INSERT INTO GAME (Game_ID, Title, ESRB_Rtng, Company_ID, Description) VALUES ('amns', 'Amnesia: The Dark Descent', 'NR', 'frg', '.....');
-	INSERT INTO GAME (Game_ID, Title, ESRB_Rtng, Company_ID, Description) VALUES ('lmb', 'LIMBO', 'NR', 'pd', 'Uncertain of his sister’s fate, a boy enters LIMBO');
-	INSERT INTO GAME (Game_ID, Title, ESRB_Rtng, Company_ID, Description) VALUES ('ptl', 'Portal', 'NR', 'vlv', 'Players must solve physical puzzles and challenges by opening portals to maneuvering objects, and themselves, through space.');
-	INSERT INTO GAME (Game_ID, Title, ESRB_Rtng, Company_ID, Description) VALUES ('ptl2', 'Portal 2', 'NR', 'vlv', 'Players will explore never-before-seen areas of the Aperture Science Labs and be reunited with GLaDOS, the occasionally murderous computer companion who guided them through the original game.');
-	INSERT INTO GAME (Game_ID, Title, ESRB_Rtng, Company_ID, Description) VALUES ('trr', 'Terraria', 'T', 'rl', 'The very world is at your fingertips as you fight for survival, fortune, and glory. Delve deep into cavernous expanses, seek out ever-greater foes to test your mettle in combat, or construct your own city - In the World of Terraria, the choice is yours! Blending elements of classic action games with the freedom of sandbox-style creativity, Terraria is a unique gaming experience where both the journey and the destination are as unique as the players themselves!');
-	INSERT INTO GAME (Game_ID, Title, ESRB_Rtng, Company_ID, Description) VALUES ('bsk', 'BioShock', 'M', '2k', 'BioShock is a shooter unlike any you’ve ever played, loaded with weapons and tactics never seen. You’ll have a complete arsenal at your disposal from simple revolvers to grenade launchers and chemical throwers, but you’ll also be forced to genetically modify your DNA to create an even more deadly weapon: you. Injectable plasmids give you super human powers: blast electrical currents into water to electrocute multiple enemies, or freeze them solid and obliterate them with the swing of a wrench. No encounter ever plays out the same, and no two gamers will play the game the same way.');
-	INSERT INTO GAME (Game_ID, Title, ESRB_Rtng, Company_ID, Description) VALUES ('bsk2', 'BioShock 2', 'M', '2k', 'Set approximately 10 years after the events of the original BioShock, the halls of Rapture once again echo with sins of the past. Along the Atlantic coastline, a monster has been snatching little girls and bringing them back to the undersea city of Rapture. Players step into the boots of the most iconic denizen of Rapture, the Big Daddy, as they travel through the decrepit and beautiful fallen city, chasing an unseen foe in search of answers and their own survival.');
-	INSERT INTO GAME (Game_ID, Title, ESRB_Rtng, Company_ID, Description) VALUES ('bski', 'BioShock: Infinite', 'M', '2k', 'Indebted to the wrong people, with his life on the line, veteran of the U.S. Cavalry and now hired gun, Booker DeWitt has only one opportunity to wipe his slate clean. He must rescue Elizabeth, a mysterious girl imprisoned since childhood and locked up in the flying city of Columbia. Forced to trust one another, Booker and Elizabeth form a powerful bond during their daring escape. Together, they learn to harness an expanding arsenal of weapons and abilities, as they fight on zeppelins in the clouds, along high-speed Sky-Lines, and down in the streets of Columbia, all while surviving the threats of the air-city and uncovering its dark secret.');
-	INSERT INTO GAME (Game_ID, Title, ESRB_Rtng, Company_ID, Description) VALUES ('des','Destiny','T','act','You are one of humanity’s last remaining Guardians. Your home and your power has been taken from you by a brutal invader – Ghaul. With humanity on the brink, it’s up to you to fight back and reclaim our world.');
-	INSERT INTO GAME (Game_ID, Title, ESRB_Rtng, Company_ID, Description) VALUES ('des2','Destiny 2','T','act','Humanity’s last safe city has fallen to an overwhelming invasion force, led by Ghaul, the imposing commander of the brutal Red Legion. He has stripped the city’s Guardians of their power, and forced the survivors to flee. You will venture to mysterious, unexplored worlds of our solar system to discover an arsenal of weapons and devastating new combat abilities.');
-	INSERT INTO GAME (Game_ID, Title, ESRB_Rtng, Company_ID, Description) VALUES ('pkmsm','Pokemon: Sun and Moon','E','gf','The player and the mother move from Kanto to Alola. However, at roughly the same time, a young girl is seen escaping what seems to be a lab with an unidentified Pokémon in her bag. As she gets cornered by the workers in the area, the Pokémon teleports itself and the girl away from the lab and away from danger.');
-	INSERT INTO GAME (Game_ID, Title, ESRB_Rtng, Company_ID, Description) VALUES ('pkmu2sm','Pokemon: Ultra Sun and Moon','E','gf','');
-	INSERT INTO GAME (Game_ID, Title, ESRB_Rtng, Company_ID, Description) VALUES ('starc','StarCraft','T','bl','Long ago four supercarriers loaded with political dissidents and convicts from Earth crash-landed on the distant planets of Tarsonis, Moria, and Umoja.');
-	INSERT INTO GAME (Game_ID, Title, ESRB_Rtng, Company_ID, Description) VALUES ("gta5", "Grand Theft Auto 5", "M", "rstr", "Play as three guys and take control of the city or just roam around and perform illegal actions");
-	INSERT INTO GAME (Game_ID, Title, ESRB_Rtng, Company_ID, Description) VALUES ("gh2", "Guitar Hero 2", "T", "hmx","Rock the Rhythm, Lead, and Bass Guitar tracks in the follow-up sequel to Guitar Hero. With over 55 tracks to rock out to, you'll go from Guitar Hero to Guitar god in one press of a fret button.");
-	INSERT INTO GAME (Game_ID, Title, ESRB_Rtng, Company_ID, Description) VALUES ("gh", "Guitar Hero", "T", "hmx", "Ready to rock?! Play the top rock songs while using a guitar controller.");
-	INSERT INTO GAME (Game_ID, Title, ESRB_Rtng, Company_ID, Description) VALUES ("gta4","Grand Theft Auto 4", "M", "rstr", "Rockstar's vivid tale of Niko Bellic, an immigrant with convictions powerful enough to rocket him through the crumbling substructures of Liberty City's world.");
-	INSERT INTO GAME (Game_ID, Title, ESRB_Rtng, Company_ID, Description) VALUES ("gtasa", "Grand Theft Auto San Andreas", "M", "rstr", "On his return to the neighborhood, a couple of corrupt cops framed Carl 'CJ' Johnson (Main Character) for homicide. CJ is forced on a journey that takes him across the entire state of San Andreas, to save his family and to take control of the streets.");
-	INSERT INTO GAME (Game_ID, Title, ESRB_Rtng, Company_ID, Description) VALUES ("heavy", "Heavy Rain", "M", "quand","The game is a film noir thriller, featuring four diverse protagonists involved with the mystery of the Origami Killer, a serial killer who uses extended periods of rainfall to drown his victims");
-	INSERT INTO GAME (Game_ID, Title, ESRB_Rtng, Company_ID, Description) VALUES ("kh", "Kingdom Hearts" ,"E10","se","Kingdom Hearts is about a boy named Sora who travels world-to-world, to save his friends and to tame the world from darkness"); 
-	INSERT INTO GAME (Game_ID, Title, ESRB_Rtng, Company_ID, Description) VALUES ("kh2", "Kingdom Hearts 2", "E10","se", "After a couple of years in sleep, Sora finds out that there will be a war soon, It is up to him to stop who's behind it all...Xehanort");
-	INSERT INTO GAME (Game_ID, Title, ESRB_Rtng, Company_ID, Description) VALUES ("kh3", "Kingdom Hearts 3", "E10","se", "Sora is joined by Donald Duck, Goofy, King Mickey and Riku in their search for the seven Guardians of Light and the 'Key to Return Hearts' as they attempt to thwart Master Xehanort's plan to bring about a second Keyblade War.");
-	INSERT INTO GAME (Game_ID, Title, ESRB_Rtng, Company_ID, Description) VALUES ("khbbs", "Kingdom Hears: Birth By Sleep","E10","se", "The prequel of the first Kingdom Hearts game, you follow 3 best friends on their on-going journies to figure out who is starting an uproar amonst the worlds");
-	INSERT INTO GAME (Game_ID, Title, ESRB_Rtng, Company_ID, Description) VALUES ("psna3", "Persona 3", "M", "atlus", "Persona 3 follows a group of high school students trying to cope with, understand and accept death in a world surrounded by it, as well as find their own reasons for living.");
-	INSERT INTO GAME (Game_ID, Title, ESRB_Rtng, Company_ID, Description) VALUES ("psna4", "Persona 4", "M", "atlus", "Persona 4 follows a group of high school students dealing with a mysterious TV channel dedicated to distorting and exaggerating the truth of who they are and their identities.");
-	INSERT INTO GAME (Game_ID, Title, ESRB_Rtng, Company_ID, Description) VALUES ("psna5", "Persona 5", "M", "atlus", "Persona 5 is a fantasy based on reality which follows a group of troubled high school students: the protagonist and a collection of compatriots he meets. "); 
+	INSERT INTO GAME (Game_ID, Title, ESRB_Rtng, DVP, Company_ID, Description) VALUES ('ffi', 'Final Fantasy', 'E', 0, 'se', 'Players embark on a journey to find four magical crystals that can restore peace to the world.');
+	INSERT INTO GAME (Game_ID, Title, ESRB_Rtng, DVP, Company_ID, Description) VALUES ('ffii', 'Final Fantasy II', 'E', 0, 'se', '');
+	INSERT INTO GAME (Game_ID, Title, ESRB_Rtng, DVP, Company_ID, Description) VALUES ('ffiii', 'Final Fantasy III', 'E10', 0, 'se', 'Players embark on a journey to defeat an evil empire and stop a madman from destroying the world.');
+	INSERT INTO GAME (Game_ID, Title, ESRB_Rtng, DVP, Company_ID, Description) VALUES ('ffiv', 'Final Fantasy IV', 'E10', 0, 'se', 'An adventure involving magical crystals and a mysterious kingdom.');
+	INSERT INTO GAME (Game_ID, Title, ESRB_Rtng, DVP, Company_ID, Description) VALUES ('ffv', 'Final Fantasy V', 'T', 0, 'se', 'Embark on a quest to prevent an evil being from destroying the world.');
+	INSERT INTO GAME (Game_ID, Title, ESRB_Rtng, DVP, Company_ID, Description) VALUES ('ffvi', 'Final Fantasy VI', 'E10', 0, 'se', '');
+	INSERT INTO GAME (Game_ID, Title, ESRB_Rtng, DVP, Company_ID, Description) VALUES ('ffvii', 'Final Fantasy VII', 'T', 1, 'se', 'Mako: the discovery of this natural resource drawn directly from the planet’s life force marked the dawn of a new era, and now the energy sustains the lives of people across the world. However, the Shinra Company has monopolized mako production, and in doing so established a powerful hegemony, its influence reaching the far corners of the globe. Cloud, a former member of Shinra’s military organization, SOLDIER, joins the anti-Shinra resistance group AVALANCHE, despite caring little for their motives. During one of the groups attempts to stop the company, they learn of the return of Sephiroth, Cloud’s nemesis, and that with his reemergence, the planet is in greater danger than anyone had expected. With the fate of the world riding on their success, Cloud and his allies set out to quell this deadly threat.');
+	INSERT INTO GAME (Game_ID, Title, ESRB_Rtng, DVP, Company_ID, Description) VALUES ('crntr', 'Chrono Trigger', 'E10', 1, 'se', 'Chrono, a boy from the year 1000 A.D., befriended a girl named Marle at Leene Square during a carnival. Chrono then to visit his friend Lucca, who’s working on a teleportation unit. Marle is too eager to try out the unfinished machine and it malfunctions. Instead of transporting her from one podium to another, she is sent somewhere far beyond Chrono’s time. Chrono volunteers to help and is thrust back through time. During his great adventures throughout time, Chrono discovers that, in 1999 A.D., Lavos erupts from the Earth and turns it into a desolate wasteland. United by this oncoming threat, Chrono and his comrades traverse the corridors of time in an attempt to alter the future...');
+	INSERT INTO GAME (Game_ID, Title, ESRB_Rtng, DVP, Company_ID, Description) VALUES ('crnrd', 'Radical Dreamers: Nusumenai Hoseki', 'NR', 0, 'se', 'A side story to Chrono Trigger.');
+	INSERT INTO GAME (Game_ID, Title, ESRB_Rtng, DVP, Company_ID, Description) VALUES ('mtrd', 'Metroid', 'E', 0, 'nin', '');
+	INSERT INTO GAME (Game_ID, Title, ESRB_Rtng, DVP, Company_ID, Description) VALUES ('mtrdii', 'Metroid II: Return of Samus', 'E', 0, 'nin', '');
+	INSERT INTO GAME (Game_ID, Title, ESRB_Rtng, DVP, Company_ID, Description) VALUES ('smtrd', 'Super Metroid', 'E', 1, 'nin', '');
+	INSERT INTO GAME (Game_ID, Title, ESRB_Rtng, DVP, Company_ID, Description) VALUES ('gstpd', 'Ghost Trick: Phantom Detective', 'T', 1, 'cap', 'You wake up only to find that you are dead and without memories. To make things worse, you will disappear forever when the first light of dawn comes. Will you be able to uncover the truth in time?');
+	INSERT INTO GAME (Game_ID, Title, ESRB_Rtng, DVP, Company_ID, Description) VALUES ('9hrs', '9 Hours 9 Persons 9 Doors', 'M', 0, 'chn', 'You are held captive inside a large ship with eight other characters, and must solve a series of pernicious and deadly puzzles in order to escape.');
+	INSERT INTO GAME (Game_ID, Title, ESRB_Rtng, DVP, Company_ID, Description) VALUES ('mm', 'Mega Man', 'E', 0, 'cap', 'In the year 200X, robots developed to assist mankind are commonplace thanks to the efforts of renowned robot designer Dr. Light. However, one day these robots go out of control and start attacking the populace, among them six advanced humanoid robots made by Dr. Light for industrial purposes: Cut Man, Guts Man, Ice Man, Bomb Man, Fire Man, and Elec Man. He realizes the culprit is his old rival Dr. Wily (who plots to take over the world), but is unsure of what to do. His helper robot Rock, having a strong sense of justice, offers to be converted into a fighting robot to stop Dr. Wily’s plan, becoming Mega Man. Mega Man faces off against Wily and his robots so that order may be restored.');
+	INSERT INTO GAME (Game_ID, Title, ESRB_Rtng, DVP, Company_ID, Description) VALUES ('mmii', 'Mega Man II', 'E', 0, 'cap', '');
+	INSERT INTO GAME (Game_ID, Title, ESRB_Rtng, DVP, Company_ID, Description) VALUES ('mmx', 'Mega Man X', 'E', 0, 'cap', '');	
+	INSERT INTO GAME (Game_ID, Title, ESRB_Rtng, DVP, Company_ID, Description) VALUES ('zloz', 'The Legend of Zelda', 'E', 0, 'nin', 'A small kingdom in the land of Hyrule is engulfed in chaos after an army led by Ganon, the Prince of Darkness, invaded it and stole the Triforce of Power, a part of a magical artifact bestowing great strength. In an attempt to prevent Ganon from acquiring the Triforce of Wisdom, another of the pieces, Princess Zelda splits it and hides the eight fragments in secret dungeons throughout the land. Before the princess is eventually kidnapped by Ganon, she commands her nursemaid Impa to find someone courageous enough to save the kingdom. While wandering the land, the old woman is surrounded by Ganon’s henchmen, though a young boy named Link appears and rescues her. After hearing Impa’s plea, he resolves to save Zelda and sets out to reassemble the scattered fragments of the Triforce of Wisdom, to become powerful enough to defeat Ganon.');
+	INSERT INTO GAME (Game_ID, Title, ESRB_Rtng, DVP, Company_ID, Description) VALUES ('zaol', 'The Adventure of Link', 'E', 0, 'nin', '');
+	INSERT INTO GAME (Game_ID, Title, ESRB_Rtng, DVP, Company_ID, Description) VALUES ('zltp', 'A Link to the Past', 'E', 0, 'nin', '');
+	INSERT INTO GAME (Game_ID, Title, ESRB_Rtng, DVP, Company_ID, Description) VALUES ('zlsa', 'Link’s Awakening', 'E', 0, 'nin', '');
+	INSERT INTO GAME (Game_ID, Title, ESRB_Rtng, DVP, Company_ID, Description) VALUES ('zoot', 'The Ocarina of Time', 'E', 0, 'nin', '');
+	INSERT INTO GAME (Game_ID, Title, ESRB_Rtng, DVP, Company_ID, Description) VALUES ('amns', 'Amnesia: The Dark Descent', 'NR', 0, 'frg', '..........');
+	INSERT INTO GAME (Game_ID, Title, ESRB_Rtng, DVP, Company_ID, Description) VALUES ('lmb', 'LIMBO', 'NR', 0, 'pd', 'Uncertain of his sister’s fate, a boy enters LIMBO');
+	INSERT INTO GAME (Game_ID, Title, ESRB_Rtng, DVP, Company_ID, Description) VALUES ('ptl', 'Portal', 'NR', 0, 'vlv', 'Players must solve physical puzzles and challenges by opening portals to maneuvering objects, and themselves, through space.');
+	INSERT INTO GAME (Game_ID, Title, ESRB_Rtng, DVP, Company_ID, Description) VALUES ('ptl2', 'Portal 2', 'NR', 1, 'vlv', 'Players will explore never-before-seen areas of the Aperture Science Labs and be reunited with GLaDOS, the occasionally murderous computer companion who guided them through the original game.');
+	INSERT INTO GAME (Game_ID, Title, ESRB_Rtng, DVP, Company_ID, Description) VALUES ('trr', 'Terraria', 'T', 0, 'rl', 'The very world is at your fingertips as you fight for survival, fortune, and glory. Delve deep into cavernous expanses, seek out ever-greater foes to test your mettle in combat, or construct your own city - In the World of Terraria, the choice is yours! Blending elements of classic action games with the freedom of sandbox-style creativity, Terraria is a unique gaming experience where both the journey and the destination are as unique as the players themselves!');
+	INSERT INTO GAME (Game_ID, Title, ESRB_Rtng, DVP, Company_ID, Description) VALUES ('bsk', 'BioShock', 'M', 1, '2k', 'BioShock is a shooter unlike any you’ve ever played, loaded with weapons and tactics never seen. You’ll have a complete arsenal at your disposal from simple revolvers to grenade launchers and chemical throwers, but you’ll also be forced to genetically modify your DNA to create an even more deadly weapon: you. Injectable plasmids give you super human powers: blast electrical currents into water to electrocute multiple enemies, or freeze them solid and obliterate them with the swing of a wrench. No encounter ever plays out the same, and no two gamers will play the game the same way.');
+	INSERT INTO GAME (Game_ID, Title, ESRB_Rtng, DVP, Company_ID, Description) VALUES ('bsk2', 'BioShock 2', 'M', 0, '2k', 'Set approximately 10 years after the events of the original BioShock, the halls of Rapture once again echo with sins of the past. Along the Atlantic coastline, a monster has been snatching little girls and bringing them back to the undersea city of Rapture. Players step into the boots of the most iconic denizen of Rapture, the Big Daddy, as they travel through the decrepit and beautiful fallen city, chasing an unseen foe in search of answers and their own survival.');
+	INSERT INTO GAME (Game_ID, Title, ESRB_Rtng, DVP, Company_ID, Description) VALUES ('bski', 'BioShock: Infinite', 'M', 0, '2k', 'Indebted to the wrong people, with his life on the line, veteran of the U.S. Cavalry and now hired gun, Booker DeWitt has only one opportunity to wipe his slate clean. He must rescue Elizabeth, a mysterious girl imprisoned since childhood and locked up in the flying city of Columbia. Forced to trust one another, Booker and Elizabeth form a powerful bond during their daring escape. Together, they learn to harness an expanding arsenal of weapons and abilities, as they fight on zeppelins in the clouds, along high-speed Sky-Lines, and down in the streets of Columbia, all while surviving the threats of the air-city and uncovering its dark secret.');
+	INSERT INTO GAME (Game_ID, Title, ESRB_Rtng, DVP, Company_ID, Description) VALUES ('des','Destiny','T', 0, 'act','You are one of humanity’s last remaining Guardians. Your home and your power has been taken from you by a brutal invader – Ghaul. With humanity on the brink, it’s up to you to fight back and reclaim our world.');
+	INSERT INTO GAME (Game_ID, Title, ESRB_Rtng, DVP, Company_ID, Description) VALUES ('des2','Destiny 2','T', 0, 'act','Humanity’s last safe city has fallen to an overwhelming invasion force, led by Ghaul, the imposing commander of the brutal Red Legion. He has stripped the city’s Guardians of their power, and forced the survivors to flee. You will venture to mysterious, unexplored worlds of our solar system to discover an arsenal of weapons and devastating new combat abilities.');
+	INSERT INTO GAME (Game_ID, Title, ESRB_Rtng, DVP, Company_ID, Description) VALUES ('pkmsm','Pokemon: Sun and Moon','E', 0, 'gf','The player and the mother move from Kanto to Alola. However, at roughly the same time, a young girl is seen escaping what seems to be a lab with an unidentified Pokémon in her bag. As she gets cornered by the workers in the area, the Pokémon teleports itself and the girl away from the lab and away from danger.');
+	INSERT INTO GAME (Game_ID, Title, ESRB_Rtng, DVP, Company_ID, Description) VALUES ('pkmu2sm','Pokemon: Ultra Sun and Moon','E', 0, 'gf','');
+	INSERT INTO GAME (Game_ID, Title, ESRB_Rtng, DVP, Company_ID, Description) VALUES ('starc','StarCraft','T', 1,'bl','Long ago four supercarriers loaded with political dissidents and convicts from Earth crash-landed on the distant planets of Tarsonis, Moria, and Umoja.');
+	INSERT INTO GAME (Game_ID, Title, ESRB_Rtng, DVP, Company_ID, Description) VALUES ("gta5", "Grand Theft Auto 5", "M", 0, "rstr", "Play as three guys and take control of the city or just roam around and perform illegal actions");
+	INSERT INTO GAME (Game_ID, Title, ESRB_Rtng, DVP, Company_ID, Description) VALUES ("gh2", "Guitar Hero 2", "T", 0, "hmx","Rock the Rhythm, Lead, and Bass Guitar tracks in the follow-up sequel to Guitar Hero. With over 55 tracks to rock out to, you'll go from Guitar Hero to Guitar god in one press of a fret button.");
+	INSERT INTO GAME (Game_ID, Title, ESRB_Rtng, DVP, Company_ID, Description) VALUES ("gh", "Guitar Hero", "T", 0, "hmx", "Ready to rock?! Play the top rock songs while using a guitar controller.");
+	INSERT INTO GAME (Game_ID, Title, ESRB_Rtng, DVP, Company_ID, Description) VALUES ("gta4","Grand Theft Auto 4", "M", 0, "rstr", "Rockstar's vivid tale of Niko Bellic, an immigrant with convictions powerful enough to rocket him through the crumbling substructures of Liberty City's world.");
+	INSERT INTO GAME (Game_ID, Title, ESRB_Rtng, DVP, Company_ID, Description) VALUES ("gtasa", "Grand Theft Auto San Andreas", "M", 0, "rstr", "On his return to the neighborhood, a couple of corrupt cops framed Carl 'CJ' Johnson (Main Character) for homicide. CJ is forced on a journey that takes him across the entire state of San Andreas, to save his family and to take control of the streets.");
+	INSERT INTO GAME (Game_ID, Title, ESRB_Rtng, DVP, Company_ID, Description) VALUES ("heavy", "Heavy Rain", "M", 0, "quand","The game is a film noir thriller, featuring four diverse protagonists involved with the mystery of the Origami Killer, a serial killer who uses extended periods of rainfall to drown his victims");
+	INSERT INTO GAME (Game_ID, Title, ESRB_Rtng, DVP, Company_ID, Description) VALUES ("kh", "Kingdom Hearts", "E10", 0, "se","Kingdom Hearts is about a boy named Sora who travels world-to-world, to save his friends and to tame the world from darkness"); 
+	INSERT INTO GAME (Game_ID, Title, ESRB_Rtng, DVP, Company_ID, Description) VALUES ("kh2", "Kingdom Hearts 2", "E10", 1, "se", "After a couple of years in sleep, Sora finds out that there will be a war soon, It is up to him to stop who's behind it all...Xehanort");
+	INSERT INTO GAME (Game_ID, Title, ESRB_Rtng, DVP, Company_ID, Description) VALUES ("kh3", "Kingdom Hearts 3", "E10", 0, "se", "Sora is joined by Donald Duck, Goofy, King Mickey and Riku in their search for the seven Guardians of Light and the 'Key to Return Hearts' as they attempt to thwart Master Xehanort's plan to bring about a second Keyblade War.");
+	INSERT INTO GAME (Game_ID, Title, ESRB_Rtng, DVP, Company_ID, Description) VALUES ("khbbs", "Kingdom Hears: Birth By Sleep", "E10", 1, "se", "The prequel of the first Kingdom Hearts game, you follow 3 best friends on their on-going journies to figure out who is starting an uproar amonst the worlds");
+	INSERT INTO GAME (Game_ID, Title, ESRB_Rtng, DVP, Company_ID, Description) VALUES ("psna3", "Persona 3", "M", 0, "atlus", "Persona 3 follows a group of high school students trying to cope with, understand and accept death in a world surrounded by it, as well as find their own reasons for living.");
+	INSERT INTO GAME (Game_ID, Title, ESRB_Rtng, DVP, Company_ID, Description) VALUES ("psna4", "Persona 4", "M", 0, "atlus", "Persona 4 follows a group of high school students dealing with a mysterious TV channel dedicated to distorting and exaggerating the truth of who they are and their identities.");
+	INSERT INTO GAME (Game_ID, Title, ESRB_Rtng, DVP, Company_ID, Description) VALUES ("psna5", "Persona 5", "M", 0, "atlus", "Persona 5 is a fantasy based on reality which follows a group of troubled high school students: the protagonist and a collection of compatriots he meets. "); 
 
 CREATE TABLE ROM
 (
@@ -751,7 +783,7 @@ CREATE TABLE PERSON
 	Last_Name		VARCHAR(15)		NOT NULL
 );
 
-#6
+#24
 
 	INSERT INTO PERSON (Person_ID, First_Name, Last_Name) VALUES ('sqec', 'Yosuke', 'Matsuda');
 	INSERT INTO PERSON (Person_ID, First_Name, Last_Name) VALUES ('bstb', 'Tetsuya', 'Nomura');
@@ -759,6 +791,24 @@ CREATE TABLE PERSON
 	INSERT INTO PERSON (Person_ID, First_Name, Last_Name) VALUES ('ccc', 'Kenzo', 'Tsujimoto');
 	INSERT INTO PERSON (Person_ID, First_Name, Last_Name) VALUES ('cpc', 'Haruhiro', 'Tsujimoto');
 	INSERT INTO PERSON (Person_ID, First_Name, Last_Name) VALUES ('pwl', 'Janet', 'Hsu');
+	INSERT INTO PERSON (Person_ID, First_Name, Last_Name) VALUES ("drdc", "David", "Cage");
+	INSERT INTO PERSON (Person_ID, First_Name, Last_Name) VALUES ("wrdc","David", "Cage");
+	INSERT INTO PERSON (Person_ID, First_Name, Last_Name) VALUES ("procc", "Charles", "Coutier");
+	INSERT INTO PERSON (Person_ID, First_Name, Last_Name) VALUES ("cmpnc", "Normand", "Corbeil");
+	INSERT INTO PERSON (Person_ID, First_Name, Last_Name) VALUES ("prolb", "Leslie", "Benzies");
+	INSERT INTO PERSON (Person_ID, First_Name, Last_Name) VALUES ("prois", "Imran", "Sarwar");
+	INSERT INTO PERSON (Person_ID, First_Name, Last_Name) VALUES ("dlb", "Leslie", "Benzies");
+	INSERT INTO PERSON (Person_ID, First_Name, Last_Name) VALUES ("progaf", "Adam", "Fowler");
+	INSERT INTO PERSON (Person_ID, First_Name, Last_Name) VALUES ("artag", "Aron", "Garbut");
+	INSERT INTO PERSON (Person_ID, First_Name, Last_Name) VALUES ("wrrh", "Rupert", "Humphries");
+	INSERT INTO PERSON (Person_ID, First_Name, Last_Name) VALUES ("dgl", "Greg", "LoPiccolo");
+	INSERT INTO PERSON (Person_ID, First_Name, Last_Name) VALUES ("desrk", "Robert", "Kay");
+	INSERT INTO PERSON (Person_ID, First_Name, Last_Name) VALUES ("artrl", "Ryan", "Lesser");
+	INSERT INTO PERSON (Person_ID, First_Name, Last_Name) VALUES ("pdir", "Katsura", "Hashino");
+	INSERT INTO PERSON (Person_ID, First_Name, Last_Name) VALUES ("pdes", "Naoya", "Maeda");
+	INSERT INTO PERSON (Person_ID, First_Name, Last_Name) VALUES ("ppro", "Yujiro", "Kosaka");
+	INSERT INTO PERSON (Person_ID, First_Name, Last_Name) VALUES ("part", "Masayoshi", "Suto");
+	INSERT INTO PERSON (Person_ID, First_Name, Last_Name) VALUES ("pwr", "Shinji", "Yamamoto");
 
 CREATE TABLE POSITION
 (
@@ -770,7 +820,7 @@ CREATE TABLE POSITION
 	FOREIGN KEY(Company_ID) REFERENCES COMPANY(Company_ID)
 );
 
-#9
+#27
 
 	INSERT INTO POSITION (Position_ID, Person_ID, Company_ID, Title) VALUES ('sqceo', 'sqec', 'se', 'CEO');
 	INSERT INTO POSITION (Position_ID, Person_ID, Company_ID, Title) VALUES ('svga1', 'bstb', 'se', 'Video Game Artist');
@@ -781,6 +831,24 @@ CREATE TABLE POSITION
 	INSERT INTO POSITION (Position_ID, Person_ID, Company_ID, Title) VALUES ('ccoo', 'cpc', 'cap', 'COO');
 	INSERT INTO POSITION (Position_ID, Person_ID, Company_ID, Title) VALUES ('ccp', 'cpc', 'cap', 'President');
 	INSERT INTO POSITION (Position_ID, Person_ID, Company_ID, Title) VALUES ('lzm1', 'pwl', 'cap', 'Localization Team Member');
+	INSERT INTO POSITION (Position_ID, Person_ID, Company_ID, Title) VALUES ("pnad", "pdir", "atlus", "Director");
+	INSERT INTO POSITION (Position_ID, Person_ID, Company_ID, Title) VALUES ("pnade", "pdes", "atlus", "Designer");
+	INSERT INTO POSITION (Position_ID, Person_ID, Company_ID, Title) VALUES ("pnapr", "ppro", "atlus", "Programmer");
+	INSERT INTO POSITION (Position_ID, Person_ID, Company_ID, Title) VALUES ("pnaar", "part", "atlus", "Artist");
+	INSERT INTO POSITION (Position_ID, Person_ID, Company_ID, Title) VALUES ("pnawr", "pwr", "atlus", "Writer");
+	INSERT INTO POSITION (Position_ID, Person_ID, Company_ID, Title) VALUES ("ghd", "dgl", "hmx", "Director");
+	INSERT INTO POSITION (Position_ID, Person_ID, Company_ID, Title) VALUES ("ghdes", "desrk", "hmx", "Designer");
+	INSERT INTO POSITION (Position_ID, Person_ID, Company_ID, Title) VALUES ("ghart", "artrl", "hmx", "Artist");
+	INSERT INTO POSITION (Position_ID, Person_ID, Company_ID, Title) VALUES ("hrd", "drdc", "quand", "Director");
+	INSERT INTO POSITION (Position_ID, Person_ID, Company_ID, Title) VALUES ("hrc", "wrdc", "quand", "Writer");
+	INSERT INTO POSITION (Position_ID, Person_ID, Company_ID, Title) VALUES ("hrp", "procc", "quand", "Producer");
+	INSERT INTO POSITION (Position_ID, Person_ID, Company_ID, Title) VALUES ("hrcm", "cmpnc", "quand", "Composer");
+	INSERT INTO POSITION (Position_ID, Person_ID, Company_ID, Title) VALUES ("gta5p", "prolb", "rstr", "Producer");
+	INSERT INTO POSITION (Position_ID, Person_ID, Company_ID, Title) VALUES ("gta5p2", "prois", "rstr", "Producer");
+	INSERT INTO POSITION (Position_ID, Person_ID, Company_ID, Title) VALUES ("gta5d", "dlb", "rstr", "Director");
+	INSERT INTO POSITION (Position_ID, Person_ID, Company_ID, Title) VALUES ("gta5p3", "progaf", "rstr", "Programmer");
+	INSERT INTO POSITION (Position_ID, Person_ID, Company_ID, Title) VALUES ("gta5a", "artag", "rstr", "Programmer");
+	INSERT INTO POSITION (Position_ID, Person_ID, Company_ID, Title) VALUES ("gta5w", "wrrh", "rstr", "Programmer");
 
 CREATE TABLE REVIEWER	
 (
